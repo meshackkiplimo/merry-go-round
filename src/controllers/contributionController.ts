@@ -7,8 +7,10 @@ export const logContribution = async (req: Request, res: Response) => {
     const contribution = new Contribution({ userId, amount, cycleNumber });
     await contribution.save();
     res.json({ message: 'Contribution logged' });
+    return
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
+    return
   }
 };
 
@@ -18,5 +20,6 @@ export const getHistory = async (req: Request, res: Response) => {
     res.json(history);
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
+    return
   }
 };
