@@ -22,7 +22,11 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Merry-Go-Round Backend is Running!');
 });
 
-const PORT = process.env.PORT || 9000;
-app.listen(PORT, () => {
-  logger.info(`Server running on http://localhost:${PORT}`);
-});
+const PORT = process.env.PORT ;
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running on: http://localhost:${PORT}`);
+  });
+}
+
+export { app };
