@@ -1,0 +1,34 @@
+name: Auto Create Pull Request
+
+# Trigger on push to any branch except 'main'
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for accurate diff
+
+      # Create or update a pull request
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }} # Default GitHub token
+          base: main # Target branch for the PR
+          branch: ${{ github.ref_name }} # Source branch (the one pushed)
+          title: "Auto PR: ${{ github.ref_name }} to main"
+          body: |
+            This pull request was automatically created by GitHub Actions.
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Pushed by: ${{ github.actor }}
+          labels: automated-pr
+          commit-message: "Auto PR from ${{ github.ref_name }}"

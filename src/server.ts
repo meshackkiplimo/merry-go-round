@@ -4,18 +4,27 @@ import authRoutes from './routes/authRoutes';
 import contributionRoutes from './routes/contributionRoutes';
 import { logger } from './utils/logger';
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 
+app.use(cors({
+  origin: ['http://localhost:3000'], // Frontend's URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+}));
+app.use(express.json());
+
+
 // Connect to MongoDB
 connectDB();
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api', contributionRoutes);
+app.use('/api/user', authRoutes);
+app.use('/api/contribution', contributionRoutes);
 
 // Test Route
 app.get('/', (req: Request, res: Response) => {
