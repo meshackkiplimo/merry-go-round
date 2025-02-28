@@ -1,41 +1,41 @@
 import express, { Request, Response } from 'express';
+import dotenv from 'dotenv';
 import { connectDB } from './config/db';
 import authRoutes from './routes/authRoutes';
 import contributionRoutes from './routes/contributionRoutes';
 import { logger } from './utils/logger';
-import dotenv from 'dotenv';
 import cors from 'cors';
 
 dotenv.config();
 
 const app = express();
-app.use(express.json());
 
+
+app.use(express.json()); 
 app.use(cors({
-  origin: ['http://localhost:3000'], // Frontend's URL
+  origin: ['http://localhost:3000'], 
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
 }));
-app.use(express.json());
-
 
 // Connect to MongoDB
-connectDB();
+connectDB()
 
 // Routes
-app.use('/api/user', authRoutes);
-app.use('/api/contribution', contributionRoutes);
+app.use('/api/user', authRoutes); 
+app.use('/api/contribution', contributionRoutes); 
 
 // Test Route
 app.get('/', (req: Request, res: Response) => {
   res.send('Merry-Go-Round Backend is Running!');
 });
 
-const PORT = process.env.PORT ;
+// Local development only
 if (require.main === module) {
+  const PORT = process.env.PORT || 8001
   app.listen(PORT, () => {
-    console.log(`Server running on: http://localhost:${PORT}`);
+    logger.info(`Server running on: http://localhost:${PORT}`);
   });
 }
 
-export { app };
+export default app; 
