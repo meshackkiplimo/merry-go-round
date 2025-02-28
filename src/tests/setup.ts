@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { connectDB, disconnectDB } from '../config/db';
+import app from '../server';
 
 beforeAll(async () => {
   await connectDB();
@@ -9,6 +10,4 @@ afterAll(async () => {
   await mongoose.connection.dropDatabase();
   await disconnectDB();
 }, 10000);
-
-// Export app for tests
-export { app } from '../server';
+export default app;
