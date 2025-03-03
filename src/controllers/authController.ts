@@ -2,6 +2,15 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user';
+import { v2 as cloudinary } from 'cloudinary';
+
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 
 export const me = async (req: Request, res: Response) => {
   try {
@@ -80,5 +89,59 @@ export const login = async (req: Request, res: Response) => {
     console.error('Login Error:', error.message);
     res.status(500).json({ message: 'Server error' });
     return;
+  }
+};
+
+export const updateProfile = async (req: Request, res: Response) => {
+  try {
+    console.log('Updating Profile - req.user:', req.user);
+    if (!req.user) {
+      console.log('No req.user - Unauthorized');
+      res.status(401).json({ message: 'Unauthorized' });
+      return
+    }
+
+    const { name, imageUrl, location, jobStatus, familyName } = req.body;
+    console.log('Update Request Body:', { name, imageUrl, location, jobStatus, familyName });
+
+    let finalImageUrl = imageUrl;
+    if (imageUrl && imageUrl.startsWith('data:image/')) { // Base64 image
+      try {
+        const uploadResult = await cloudinary.uploader.upload(imageUrl, {
+          folder: 'merry-go-round/profiles',
+          public_id: `${req.user.id}_${Date.now()}`,
+        });
+        finalImageUrl = uploadResult.secure_url;
+        console.log('Uploaded Image to Cloudinary:', finalImageUrl);
+      } catch (uploadError: any) {
+        console.error('Cloudinary Upload Error:', uploadError.message);
+        res.status(500).json({ message: 'Failed to upload image', error: uploadError.message });
+        return 
+      }
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      {
+        name,
+        imageUrl: finalImageUrl,
+        location,
+        jobStatus,
+        familyName,
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!user) {
+      console.log('User not found for ID:', req.user.id);
+      res.status(404).json({ message: 'User not found' });
+      return 
+    }
+
+    console.log('Updated User:', user);
+    res.json(user);
+  } catch (error: any) {
+    console.error('Update Profile Error:', error.message);
+    res.status(500).json({ message: 'Failed to update profile', error: error.message });
   }
 };
