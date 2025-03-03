@@ -6,6 +6,7 @@ import contributionRoutes from './routes/contributionRoutes';
 import { logger } from './utils/logger';
 import cors from 'cors';
 import memberRoutes from './routes/memberRoutes';
+import { authMiddleware } from './middleware/authMiddleware';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ connectDB()
 app.use('/api/user', authRoutes); 
 app.use('/api/contribution', contributionRoutes); 
 app.use('/api/members', memberRoutes);
+
 
 // Test Route
 app.get('/', (req: Request, res: Response) => {

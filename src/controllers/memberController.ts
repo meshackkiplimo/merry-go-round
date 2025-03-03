@@ -9,3 +9,5 @@ export const getAllMembers = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Failed to fetch members', error: error.message });
   }
 };
+
+//ge
