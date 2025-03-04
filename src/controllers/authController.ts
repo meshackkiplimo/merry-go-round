@@ -3,6 +3,10 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user';
 import { v2 as cloudinary } from 'cloudinary';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 
 
 cloudinary.config({
@@ -10,6 +14,12 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+console.log('Cloudinary Config:', {
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY ? 'Set' : 'Missing',
+  api_secret: process.env.CLOUDINARY_API_SECRET ? 'Set' : 'Missing',
+});
+
 
 
 export const me = async (req: Request, res: Response) => {
@@ -80,7 +90,7 @@ export const login = async (req: Request, res: Response) => {
     const token = jwt.sign(
       { id: user._id, role: user.role },
       secret,
-      { expiresIn: '1h' }
+      { expiresIn: '5h' }
     );
     console.log('Generated Token:', token); // Debug token
     res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
@@ -88,8 +98,7 @@ export const login = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error('Login Error:', error.message);
     res.status(500).json({ message: 'Server error' });
-    return;
-  }
+    return;  }
 };
 
 export const updateProfile = async (req: Request, res: Response) => {
@@ -98,21 +107,21 @@ export const updateProfile = async (req: Request, res: Response) => {
     if (!req.user) {
       console.log('No req.user - Unauthorized');
       res.status(401).json({ message: 'Unauthorized' });
-      return
+      return 
     }
 
-    const { name, imageUrl, location, jobStatus, familyName } = req.body;
-    console.log('Update Request Body:', { name, imageUrl, location, jobStatus, familyName });
+    const { name, location, jobStatus, familyName } = req.body;
+    console.log('Update Request Body:', { name, location, jobStatus, familyName });
 
-    let finalImageUrl = imageUrl;
-    if (imageUrl && imageUrl.startsWith('data:image/')) { // Base64 image
+    let imageUrl = req.body.imageUrl; // Existing URL if no new file
+    if (req.file) { // Multer provides req.file for uploaded image
       try {
-        const uploadResult = await cloudinary.uploader.upload(imageUrl, {
+        const uploadResult = await cloudinary.uploader.upload(req.file.path, {
           folder: 'merry-go-round/profiles',
           public_id: `${req.user.id}_${Date.now()}`,
         });
-        finalImageUrl = uploadResult.secure_url;
-        console.log('Uploaded Image to Cloudinary:', finalImageUrl);
+        imageUrl = uploadResult.secure_url;
+        console.log('Uploaded Image to Cloudinary:', imageUrl);
       } catch (uploadError: any) {
         console.error('Cloudinary Upload Error:', uploadError.message);
         res.status(500).json({ message: 'Failed to upload image', error: uploadError.message });
@@ -124,7 +133,7 @@ export const updateProfile = async (req: Request, res: Response) => {
       req.user.id,
       {
         name,
-        imageUrl: finalImageUrl,
+        imageUrl,
         location,
         jobStatus,
         familyName,
