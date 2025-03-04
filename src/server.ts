@@ -9,6 +9,11 @@ import memberRoutes from './routes/memberRoutes';
 import { authMiddleware } from './middleware/authMiddleware';
 
 dotenv.config();
+console.log('Environment Variables Loaded:', {
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY ? 'Set' : 'Missing',
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET ? 'Set' : 'Missing',
+});
 
 const app = express();
 
