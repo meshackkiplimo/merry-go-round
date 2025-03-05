@@ -7,6 +7,7 @@ import { logger } from './utils/logger';
 import cors from 'cors';
 import memberRoutes from './routes/memberRoutes';
 import { authMiddleware } from './middleware/authMiddleware';
+import mpesaRoutes from './routes/mpesaRoutes';
 
 dotenv.config();
 console.log('Environment Variables Loaded:', {
@@ -32,6 +33,8 @@ connectDB()
 app.use('/api/user', authRoutes); 
 app.use('/api/contribution', contributionRoutes); 
 app.use('/api/members', memberRoutes);
+app.use('/api/mpesa', mpesaRoutes);
+app.use('/api/contributions', mpesaRoutes);
 
 
 // Test Route
