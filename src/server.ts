@@ -26,10 +26,10 @@ app.use(cors({
   credentials: true,
 }));
 
-// Connect to MongoDB
+
 connectDB()
 
-// Routes
+
 app.use('/api/user', authRoutes); 
 app.use('/api/contribution', contributionRoutes); 
 app.use('/api/members', memberRoutes);
@@ -37,12 +37,11 @@ app.use('/api/mpesa', mpesaRoutes);
 app.use('/api/contributions', mpesaRoutes);
 
 
-// Test Route
 app.get('/', (req: Request, res: Response) => {
   res.send('Merry-Go-Round Backend is Running!');
 });
 
-// Local development only
+
 if (require.main === module) {
   const PORT = process.env.PORT || 8001
   app.listen(PORT, () => {
