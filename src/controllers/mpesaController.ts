@@ -1,15 +1,14 @@
 import { Request, Response } from 'express';
 import axios from 'axios';
-import { Contribution } from '../models/contribution'; // Create this model
+import { Contribution } from '../models/contribution'; 
 
-// M-Pesa credentials (from Safaricom Developer Portal)
 const MPESA_CONSUMER_KEY = process.env.MPESA_CONSUMER_KEY;
 const MPESA_CONSUMER_SECRET = process.env.MPESA_CONSUMER_SECRET;
-const MPESA_SHORTCODE = process.env.MPESA_SHORTCODE; // Business Shortcode
-const MPESA_PASSKEY = process.env.MPESA_PASSKEY; // Lipa na M-Pesa Passkey
-const MPESA_CALLBACK_URL = process.env.MPESA_CALLBACK_URL; // Your callback URL
+const MPESA_SHORTCODE = process.env.MPESA_SHORTCODE; 
+const MPESA_PASSKEY = process.env.MPESA_PASSKEY;
+const MPESA_CALLBACK_URL = process.env.MPESA_CALLBACK_URL; 
 
-// Generate OAuth token
+
 const getMpesaToken = async () => {
   const auth = Buffer.from(`${MPESA_CONSUMER_KEY}:${MPESA_CONSUMER_SECRET}`).toString('base64');
   const response = await axios.get('https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
@@ -20,7 +19,7 @@ const getMpesaToken = async () => {
   return response.data.access_token;
 };
 
-// Initiate STK Push
+
 export const initiateStkPush = async (req: Request, res: Response) => {
   try {
     const { phone, amount } = req.body;
@@ -37,7 +36,7 @@ export const initiateStkPush = async (req: Request, res: Response) => {
         Timestamp: timestamp,
         TransactionType: 'CustomerPayBillOnline',
         Amount: amount,
-        PartyA: phone, // Phone number paying
+        PartyA: phone, 
         PartyB: MPESA_SHORTCODE,
         PhoneNumber: phone,
         CallBackURL: MPESA_CALLBACK_URL,
@@ -53,7 +52,7 @@ export const initiateStkPush = async (req: Request, res: Response) => {
     );
 
     console.log('STK Push Response:', response.data);
-    res.json(response.data); // Returns CheckoutRequestID
+    res.json(response.data); 
   } catch (error: any) {
     console.error('STK Push Error:', error.response?.data || error.message);
     res.status(500).json({ message: 'Failed to initiate payment', error: error.response?.data || error.message });
