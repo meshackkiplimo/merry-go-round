@@ -9,6 +9,7 @@ const userSchema = new Schema({
   location: { type: String },
   jobStatus: { type: String },
   familyName: { type: String },
+  gender: { type: String},
 });
 
 export const User = model('User', userSchema);

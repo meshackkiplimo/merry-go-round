@@ -110,8 +110,8 @@ export const updateProfile = async (req: Request, res: Response) => {
       return 
     }
 
-    const { name, location, jobStatus, familyName } = req.body;
-    console.log('Update Request Body:', { name, location, jobStatus, familyName });
+    const { name, location, jobStatus, familyName,gender } = req.body;
+    console.log('Update Request Bodyjjjjj:', { name, location, jobStatus, familyName,gender });
 
     let imageUrl = req.body.imageUrl; // Existing URL if no new file
     if (req.file) { // Multer provides req.file for uploaded image
@@ -137,6 +137,7 @@ export const updateProfile = async (req: Request, res: Response) => {
         location,
         jobStatus,
         familyName,
+        gender
       },
       { new: true, runValidators: true }
     );
