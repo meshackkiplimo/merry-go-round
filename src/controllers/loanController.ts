@@ -44,12 +44,9 @@ export const submitLoanApplication = async (req: Request, res: Response) => {
 
 export const getLoanHistory = async (req: Request, res: Response) => {
   try {
-    // Fetch all loans
-    // Note: In a real application, you would want to:
-    // 1. Add pagination
-    // 2. Filter by user (using authentication)
-    // 3. Add date filters
+    console.log('Fetching all loans...'); // Debug log
     const loans = await Loan.find().sort({ createdAt: -1 });
+    console.log('Found loans:', loans); // Debug log
 
     res.status(200).json({
       success: true,
@@ -57,6 +54,7 @@ export const getLoanHistory = async (req: Request, res: Response) => {
       data: loans,
     });
   } catch (error: any) {
+    console.error('Error fetching loans:', error); // Debug log
     res.status(400).json({
       success: false,
       message: error.message || 'Failed to fetch loan history',

@@ -85,8 +85,23 @@ export const confirmPayment = async (req: Request, res: Response) => {
     console.log('Payment Confirmation Response:', result);
 
     if (result.ResultCode === '0') {
-      // Payment successful
-      res.json({ success: true, message: 'Payment confirmed' });
+      // Extract amount from callback metadata
+      const amount = parseFloat(result.CallbackMetadata?.Item?.find((item: any) => item.Name === 'Amount')?.Value || '0');
+      
+      // Save contribution if amount is valid and user is authenticated
+      if (amount > 0 && req.user?.id) {
+        const contribution = new Contribution({
+          userId: req.user.id,
+          amount: amount,
+          cycleNumber: 1, // This could be passed as a parameter or determined programmatically
+          date: new Date(),
+        });
+        await contribution.save();
+        console.log('Contribution saved:', contribution);
+        res.json({ success: true, message: 'Payment confirmed and contribution saved' });
+      } else {
+        res.json({ success: true, message: 'Payment confirmed but contribution not saved - invalid amount or missing user' });
+      }
     } else {
       res.json({ success: false, message: result.ResultDesc });
     }
